@@ -1,10 +1,18 @@
 '''this is the main code that will be utilized for the Raspberry Pico
 Important imort files include the neopix repo, IR repo, GPIO repo'''
-from machine import Pin
 import time
 import neopixel
 import micropython
+from micropython import const
+from gc import collect
+import json
+from UpyIrTx import UpyIrTx
+from UpyIrRx import UpyIrRx
 from array import array
+from machine import Pin, PWM
+from time import sleep
+
+
 
 micropython.alloc_emergency_exception_buf(100)
 
@@ -17,9 +25,7 @@ status_led = 4
 status_dip = 5
 motor = 6
 IR1 = 7
-IR2 = 8
-IR3 = 9
-IR4 = 10
+
 timeout = 150000
 led_pins = [led1_pin,led2_pin,led3_pin,led4_pin]
 IR_INPUT_PINS = [IR1,IR2,IR3,IR4]
