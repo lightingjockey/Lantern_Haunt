@@ -18,7 +18,11 @@ motor = 6
 IR1 = 7
 
 timeout = 150000
-'''pixels = [strip1,strip2,strip3,strip4]
+'''
+
+
+#pixel setup
+pixels = [strip1,strip2,strip3,strip4]
 IR_INPUT_PINS = [IR1]
 strip1 = neopixel.NeoPixel(
     pixel_pin, num_pixels, brightness=0.2, auto_write=False, pixel_order=ORDER)
@@ -31,11 +35,7 @@ strip4 = neopixel.NeoPixel(
 pixel = neopixel.NeoPixel(
     pixel_pin, num_pixels, brightness=0.2, auto_write=False, pixel_order=ORDER)
 
-motor_pin = Pin(
-    motor,
-    Pin.OUT,
-    value=0
-)
+motor_pin = Pin(motor,Pin.OUT,value=0)
 
 status = Pin(
     status_dip,
@@ -121,7 +121,11 @@ def decode(data):
 def color(red,green,blue):
 
     print(red, green, blue)
-    #strip
+    '''
+    for i in pixels:
+        i.fill((red,green,blue))
+        i.show'''
+
 
 def status_blink():
     pass
