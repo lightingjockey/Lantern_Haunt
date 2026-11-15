@@ -1,4 +1,10 @@
-'''No imports, just floating variables and sudo inputs that will be used to check the flow of the code.'''
+'''No imports, just floating variables and sudo inputs that will be used to check the flow of the code.
+from machine import Pin
+from micropython import const
+from gc import collect
+import json
+from UpyIrTx import UpyIrTx
+from UpyIrRx import UpyIrRx'''
 import time
 
 from time import sleep
@@ -19,6 +25,28 @@ IR1 = 7
 
 timeout = 150000
 '''
+#ir setup
+# RP2040 RX=Pin18, TX=Pin19
+_GROVE_PIN = {'ATOM':  (32, 26),
+              'CORE2': (33, 32),
+              'BASIC': (22, 21),
+              'GRAY':  (22, 21),
+              'FIRE':  (22, 21),
+              'GO':    (22, 21),
+              'Stick': (33, 32),
+              'Else':  (18, 19)}
+_DEVICE = 'Else'
+_TX_IDLE_LEVEL = const(0)
+_TX_FREQ = const(38000)
+_TX_DUTY = const(30)
+_RX_IDLE_LEVEL = const(1)
+_RX_SIZE = const(1023)
+
+rx_pin = Pin(_GROVE_PIN[_DEVICE][0], Pin.IN)
+rx = UpyIrRx(rx_pin, _RX_SIZE, _RX_IDLE_LEVEL)
+
+tx_pin = Pin(_GROVE_PIN[_DEVICE][1], Pin.OUT)
+tx = UpyIrTx(0, tx_pin, _TX_FREQ, _TX_DUTY, _TX_IDLE_LEVEL)
 
 
 #pixel setup
