@@ -18,15 +18,19 @@ motor = 6
 IR1 = 7
 
 timeout = 150000
-'''led_pins = [led1_pin,led2_pin,led3_pin,led4_pin]
-IR_INPUT_PINS = [IR1,IR2,IR3,IR4]
-strips = [
-    neopixel.NeoPixel(
-        Pin(pin, Pin.OUT),
-        led_ct[i]
-    )
-    for i, pin in enumerate(led_pins)
-]
+'''pixels = [strip1,strip2,strip3,strip4]
+IR_INPUT_PINS = [IR1]
+strip1 = neopixel.NeoPixel(
+    pixel_pin, num_pixels, brightness=0.2, auto_write=False, pixel_order=ORDER)
+strip2 = neopixel.NeoPixel(
+    pixel_pin, num_pixels, brightness=0.2, auto_write=False, pixel_order=ORDER)
+strip3 = neopixel.NeoPixel(
+    pixel_pin, num_pixels, brightness=0.2, auto_write=False, pixel_order=ORDER)
+strip4 = neopixel.NeoPixel(
+    pixel_pin, num_pixels, brightness=0.2, auto_write=False, pixel_order=ORDER)
+pixel = neopixel.NeoPixel(
+    pixel_pin, num_pixels, brightness=0.2, auto_write=False, pixel_order=ORDER)
+
 motor_pin = Pin(
     motor,
     Pin.OUT,
@@ -48,7 +52,29 @@ statusled = Pin(
 ir_pins = [
     Pin(pin, Pin.IN, Pin.PULL_UP)
     for pin in IR_INPUT_PINS
-]'''
+]
+def wheel(pos):
+    # Input a value 0 to 255 to get a color value.
+    # The colours are a transition r - g - b - back to r.
+    if pos < 0 or pos > 255:
+        r = g = b = 0
+    elif pos < 85:
+        r = int(pos * 3)
+        g = int(255 - pos * 3)
+        b = 0
+    elif pos < 170:
+        pos -= 85
+        r = int(255 - pos * 3)
+        g = 0
+        b = int(pos * 3)
+    else:
+        pos -= 170
+        r = 0
+        g = int(pos * 3)
+        b = int(255 - pos * 3)
+    return (r, g, b) if ORDER in {neopixel.RGB, neopixel.GRB} else (r, g, b, 0)
+pixels = [strip1, strip2, strip3, strip4]
+'''
 def value(binary):
     return int(binary, 2)
 
@@ -95,15 +121,53 @@ def decode(data):
 def color(red,green,blue):
 
     print(red, green, blue)
-    ''''''
+    #strip
 
 def status_blink():
     pass
-def effect_ws2812():
-    pass
+'''
+if number == 1
+    pixel.fill((0,0,255))
+    pixel.show()
+    number = 0'''
+
 
 def startup():
     pass
+'''
+    pixels.fill((255, 0, 0))
+    # Uncomment this line if you have RGBW/GRBW NeoPixels
+    # pixels.fill((255, 0, 0, 0))
+    pixels.show()
+    time.sleep(1)
+
+    # Comment this line out if you have RGBW/GRBW NeoPixels
+    pixels.fill((0, 255, 0))
+    # Uncomment this line if you have RGBW/GRBW NeoPixels
+    # pixels.fill((0, 255, 0, 0))
+    pixels.show()
+    time.sleep(1)
+
+    # Comment this line out if you have RGBW/GRBW NeoPixels
+    pixels.fill((0, 0, 255))
+    # Uncomment this line if you have RGBW/GRBW NeoPixels
+    # pixels.fill((0, 0, 255, 0))
+    pixels.show()
+    time.sleep(1)
+
+    rainbow_cycle(0.001)  # rainbow cycle with 1ms delay per step'''
+'''
+
+
+def rainbow_cycle(wait):
+    for j in range(255):
+        for i in range(num_pixels):
+            pixel_index = (i * 256 // num_pixels) + j
+            pixels[i] = wheel(pixel_index & 255)
+        pixels.show()
+        time.sleep(wait)
+
+'''
 def ir_receive():
     pass
 
@@ -134,10 +198,12 @@ while True:
             else:
                 print("bad code")
         else:
-            Sig_loss()
+            '''pixel.fill(Sig_loss())
+            pixel.show()'''
             print("last five")
     else:
-        Sig_loss()
+        '''pixel.fill(Sig_loss())
+        pixel.show()'''
         print("first 5")
 
 
