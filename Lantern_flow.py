@@ -23,6 +23,10 @@ status_dip = 5
 motor = 6
 IR1 = 7
 
+HEADER = "10101"
+ENDER = "01010"
+previous_values = None
+
 timeout = 150000
 '''
 #ir setup
@@ -34,35 +38,70 @@ _GROVE_PIN = {'ATOM':  (32, 26),
               'FIRE':  (22, 21),
               'GO':    (22, 21),
               'Stick': (33, 32),
-              'Else':  (18, 19)}
+              'Else':  (26, 19)}
 _DEVICE = 'Else'
-_TX_IDLE_LEVEL = const(0)
-_TX_FREQ = const(38000)
-_TX_DUTY = const(30)
+
 _RX_IDLE_LEVEL = const(1)
 _RX_SIZE = const(1023)
 
 rx_pin = Pin(_GROVE_PIN[_DEVICE][0], Pin.IN)
-rx = UpyIrRx(rx_pin, _RX_SIZE, _RX_IDLE_LEVEL)
+rx = UpyIrRx(rx_pin, 100, _RX_IDLE_LEVEL)
 
 tx_pin = Pin(_GROVE_PIN[_DEVICE][1], Pin.OUT)
 tx = UpyIrTx(0, tx_pin, _TX_FREQ, _TX_DUTY, _TX_IDLE_LEVEL)
 
+#decode code v
+def decode_ir(signal):
+
+    # 2 leader pulses + 84 data pulses + 1 ending pulse
+    if len(signal) != 87:
+        return None
+
+    # Validate leader
+    if not (1800 <= signal[0] <= 3000):
+        return None
+
+    if not (800 <= signal[1] <= 1600):
+        return None
+
+    binary = ""
+
+    for i in range(42):
+
+        mark = signal[2 + (i * 2)]
+        space = signal[3 + (i * 2)]
+
+        # Validate mark duration
+        if not (200 <= mark <= 700):
+            return None
+
+        # Decode space duration
+        if 200 <= space <= 700:
+            binary += "0"
+
+        elif 800 <= space <= 1500:
+            binary += "1"
+
+        else:
+            return None
+
+    return binary
+
 
 #pixel setup
-pixels = [strip1,strip2,strip3,strip4]
 IR_INPUT_PINS = [IR1]
 strip1 = neopixel.NeoPixel(
-    pixel_pin, num_pixels, brightness=0.2, auto_write=False, pixel_order=ORDER)
+    led1_pin, led_ct[0], brightness=1, auto_write=False, pixel_order=ORDER)
 strip2 = neopixel.NeoPixel(
-    pixel_pin, num_pixels, brightness=0.2, auto_write=False, pixel_order=ORDER)
+    led2_pin, led_ct[0], brightness=1, auto_write=False, pixel_order=ORDER)
 strip3 = neopixel.NeoPixel(
-    pixel_pin, num_pixels, brightness=0.2, auto_write=False, pixel_order=ORDER)
+    led3_pin, led_ct[0], brightness=1, auto_write=False, pixel_order=ORDER)
 strip4 = neopixel.NeoPixel(
-    pixel_pin, num_pixels, brightness=0.2, auto_write=False, pixel_order=ORDER)
+    led4_pin, led_ct[0], brightness=1, auto_write=False, pixel_order=ORDER)
 pixel = neopixel.NeoPixel(
-    pixel_pin, num_pixels, brightness=0.2, auto_write=False, pixel_order=ORDER)
-
+    status_led, 1, brightness=1, auto_write=False, pixel_order=ORDER)
+    
+pixels = [strip1,strip2,strip3,strip4]
 motor_pin = Pin(motor,Pin.OUT,value=0)
 
 status = Pin(
@@ -220,6 +259,49 @@ def Sig_loss():
     return led_color
 
 while True:
+
+    ''' 
+    
+    # Wait for a packet.
+    # 15 ms quiet time separates consecutive packets.
+    result = rx.record(250, 15)
+
+    if result == UpyIrRx.ERROR_NONE:
+
+        signal = rx.get_calibrate_list()
+
+        binary = decode_ir(signal)
+
+        if binary is not None:
+
+            values = decode_packet(binary)
+            
+            if values is not None:
+
+                if values != previous_values:
+
+                    red, green, blue, motor = values
+
+                    print("Packet received!")
+                    print("Red:", red)
+                    print("Green:", green)
+                    print("Blue:", blue)
+                    print("Motor:", motor)
+
+                    # Connect your existing functions here:
+                    # color(red, green, blue)
+                    # shake(motor)
+
+                    previous_values = values
+
+        else:
+            print("Invalid IR signal")
+
+    elif result != UpyIrRx.ERROR_NO_DATA:
+        print("IR reception error:", result)
+            
+    '''
+
 
     data_input = "00000111111110000000011111111000000001111111100000"
     if data_input[0:5] == "00000":
