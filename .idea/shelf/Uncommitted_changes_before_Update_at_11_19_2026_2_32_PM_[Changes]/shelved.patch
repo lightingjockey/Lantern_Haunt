@@ -1,0 +1,62 @@
+Index: Lantern_office.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>'''this is the main code that will be utilized for the Raspberry Pico\r\nImportant imort files include the neopix repo, IR repo, GPIO repo'''\r\nfrom machine import Pin\r\nimport time\r\nimport neopixel\r\nimport micropython\r\nfrom array import array\r\n\r\nmicropython.alloc_emergency_exception_buf(100)\r\n\r\nled_ct = [8,8,8,8]\r\nled1_pin = 0\r\nled2_pin = 1\r\nled3_pin = 2\r\nled4_pin = 3\r\nstatus_led = 4\r\nstatus_dip = 5\r\nmotor = 6\r\nIR1 = 7\r\nIR2 = 8\r\nIR3 = 9\r\nIR4 = 10\r\ntimeout = 150000\r\nled_pins = [led1_pin,led2_pin,led3_pin,led4_pin]\r\nIR_INPUT_PINS = [IR1,IR2,IR3,IR4]\r\nstrips = [\r\n    neopixel.NeoPixel(\r\n        Pin(pin, Pin.OUT),\r\n        led_ct[i]\r\n    )\r\n    for i, pin in enumerate(led_pins)\r\n]\r\nmotor_pin = Pin(\r\n    motor,\r\n    Pin.OUT,\r\n    value=0\r\n)\r\n\r\nstatus = Pin(\r\n    status_dip,\r\n    Pin.IN,\r\n    Pin.PULL_UP\r\n)\r\n\r\nstatusled = Pin(\r\n    status_led,\r\n    Pin.OUT,\r\n    value=0\r\n)\r\n\r\nir_pins = [\r\n    Pin(pin, Pin.IN, Pin.PULL_UP)\r\n    for pin in IR_INPUT_PINS\r\n]\r\n\r\ndef color():\r\n    pass\r\n\r\ndef status_blink():\r\n    pass\r\ndef effect_ws2812():\r\n    pass\r\n\r\ndef startup():\r\n    pass\r\ndef ir_receive():\r\n    pass\r\n\r\ndef translate():\r\n    pass\r\n\r\ndef shake():\r\n    pass\r\n\r\ndef dark():\r\n    pass\r\n\r\ndef Sig_loss():\r\n    led_color = [0,0,255]\r\n    return led_color\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Lantern_office.py b/Lantern_office.py
+--- a/Lantern_office.py	(revision d4a22dfd7cd333c50f03a13962929aaf8e417110)
++++ b/Lantern_office.py	(date 1794422758688)
+@@ -1,10 +1,14 @@
+ '''this is the main code that will be utilized for the Raspberry Pico
+ Important imort files include the neopix repo, IR repo, GPIO repo'''
+-from machine import Pin
++from machine import pin
+ import time
+ import neopixel
+ import micropython
+ from array import array
++from ir_rx.nec import NEC_8
++
++
++
+ 
+ micropython.alloc_emergency_exception_buf(100)
+ 
+@@ -17,9 +21,6 @@
+ status_dip = 5
+ motor = 6
+ IR1 = 7
+-IR2 = 8
+-IR3 = 9
+-IR4 = 10
+ timeout = 150000
+ led_pins = [led1_pin,led2_pin,led3_pin,led4_pin]
+ IR_INPUT_PINS = [IR1,IR2,IR3,IR4]
+@@ -53,6 +54,10 @@
+     for pin in IR_INPUT_PINS
+ ]
+ 
++# Find the gpio_ir_recv input device
++devices = [evdev.InputDevice(path) for path in evdev.list_devices()]
++ir_device = IR1
++
+ def color():
+     pass
+ 
+@@ -78,3 +83,13 @@
+ def Sig_loss():
+     led_color = [0,0,255]
+     return led_color
++
++
++def ir_callback(data, addr, ctrl):
++    if data > 0:
++        print(f"Received IR Code: 0x{data:02X} (Decimal: {data})")
++        # Map specific button codes here (e.g., NEC_8 values)
++        if data == 69:  # Example: POWER button
++            print("POWER button pressed")
++        elif data == 70:  # Example: MODE button
++            print("MODE button pressed")
+\ No newline at end of file
